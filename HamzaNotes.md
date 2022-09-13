@@ -1,0 +1,17 @@
+- Basic functions  
+	- Mint: creation of users NFT along with entry of basic info  
+		- ERC721 token Save info as a JSON on ipfs along with their picture  
+			- Info: Name, Gender, Age, Weight, Height, Medications (Basics for mvp)  
+	- Update data: User (possibly doctor?) is able to update data to their record  and see history (similar to appraisal in art registry)  
+	- Add viewer: user is able to address of someone to view  
+- Breakdown of product:  
+	- Frontend  
+		- Streamlit app where all functions are accessible (possibly split into 2 apps similar to contracts below)  
+	- Backend  
+		- Main (admin) contract for mint and add user  
+		- secondary (user) contract that access and update the data to be displayed in streamlit  
+- To be researched:  
+	- Can you upload to IPFS straight from streamlit or does it have to be run through a contract?  
+	- Token-gating/limit the access to the data (submarine)  
+	- How to update the IPFS entries when the use updates their date through dApp  
+	-  
