@@ -11,7 +11,15 @@
 		- Main (admin) contract for mint and add user  
 		- secondary (user) contract that access and update the data to be displayed in streamlit  
 - To be researched:  
-	- Can you upload to IPFS straight from streamlit or does it have to be run through a contract?  
+	- Can you upload to IPFS straight from streamlit or does it have to be run through a contract?
+		A: If we can upload the file to a local path, then we can upload the file using the Pinata API.
+
 	- Token-gating/limit the access to the data (submarine)  
+		A: 
+
 	- How to update the IPFS entries when the use updates their date through dApp  
-	-  
+		A: When the file is modified, a new CID is generated and the reference to the file chances. Same with a folder/directory, when the folder or its content changes, the resulting token changes. 
+		As an alternative, we can:
+			a) Upload the EMR content as a JSON part of the metadata. This way the metadata can be edited and the file will remain the same, keeping its signature.
+			b) Get the file from the IPFS, edit it, delete the Pinata copy, upload a new copy and renew the the signature.
+			
