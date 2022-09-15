@@ -7,25 +7,29 @@ contract EmrBlocks is ERC721Full {
 
     struct Patient {
         string name;
-        uint8 dateOfBirth;
-        string gender;
-        uint32 weight; //lbs
-        uint8 height; //inches
+        uint256 dateOfBirth;
     }
 
     mapping(uint => Patient) public patientRecords;
 
-    event Weight();//TODO update patient weight and height
 
 //original registration of patient in database
     function registerPatient(
         address owner,
         string memory name,
-        uint8  dateOfBirth,
-        string memory gender,
-        uint32  weight,
-        uint8  height
-    ) public returns (uint256) {} //TODO fill out function
+        uint256  dateOfBirth,
+        string memory patientURI
+    ) public returns (uint256) {
+        uint256 tokenId = totalSupply();
+
+        _mint(owner, tokenId);
+        _setTokenURI(tokenId, patientURI);
+
+        patientRecords[tokenId] = Patient(name, dateOfBirth);
+
+        return tokenId;
+
+    } //TODO fill out function
 
     function updateWeight() public {}//TODO
 

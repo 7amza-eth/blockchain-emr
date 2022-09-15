@@ -4,6 +4,7 @@ from web3 import Web3
 from pathlib import Path
 from dotenv import load_dotenv
 import streamlit as st
+import time
 from pinata import pin_file_to_ipfs, pin_json_to_ipfs, convert_data_to_json
 
 load_dotenv()
@@ -63,10 +64,13 @@ weight = st.number_input('Insert patient weight in lbs', min_value=0, step=1)
 height = st.number_input('Insert patient height in inches', min_value=0, step=1)
 patientImage = st.file_uploader('Upload patient picture', type=["jpg", "jpeg", "png"])
 if st.button('Register Patient'):
-    patient_ipfs_hash = pin_patient(patientName,dateOfBirth,gender,weight,height, patientImage)
+    patient_ipfs_hash = pin_patient(patientName,str(dateOfBirth),gender,weight,height, patientImage)
     patient_uri = f'ipfs://{patient_ipfs_hash}'
     tx_hash = contract.functions.registerPatient(
-        address
+        address,
+        patientName,
+        time.mktime(dateOfBirth.timetuple()),
+        patient_uri
     ).transact({'from': address, 'gas': 1000000})
     receipt = w3.eth.waitForTransactionReceipt(tx_hash)
     st.write("Transaction receipt mined:")
@@ -76,5 +80,24 @@ if st.button('Register Patient'):
 st.markdown("---")
 
 # @TODO add functions for updating patients height and weight
+
+# Update a patients weight
+st.markdown('## Update Patients Weight')
+token_id = st.text_input('What is your Patient ID #')
+newWeight = st.number_input('Insert new patient weight in lbs', min_value=0, step=1)
+# @TODO should a notes section be added?
+if st.button('Update Weight'):
+    # @TODO add json update
+    st.write("Patient weight has been updated")
+st.markdown('---')
+
+# Update a patients height
+st.markdown('## Update Patients Height')
+token_id = st.text_input('What is your Patient ID #')
+newWeight = st.number_input('Insert new patient height in lbs', min_value=0, step=1)
+# @TODO should a notes section be added?
+if st.button('Update Height'):
+    # @TODO add json update
+    print("Patient height has been updated")
 
 # @TODO add function for viewing patients record
