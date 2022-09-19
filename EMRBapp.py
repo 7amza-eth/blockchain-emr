@@ -40,7 +40,7 @@ def pin_patient(patientName,dateOfBirth,gender,weight,height, patientImage):
     }
     json_data = convert_data_to_json(patientJSON)
     #pin patient json file
-    ipfs_json_hash = pin_json_to_ipfs(patientJSON)
+    ipfs_json_hash = pin_json_to_ipfs(json_data)
     return ipfs_json_hash
 
 def pinUpdateHeight(): #@TODO pinning updated height to patient json, update already made json??
