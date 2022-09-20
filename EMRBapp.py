@@ -14,16 +14,16 @@ w3 = Web3(Web3.HTTPProvider(os.getenv("WEB3_PROVIDER_URI")))
 
 # Loads contract using cache and connect ausing ddress and ABI
 @st.cache(allow_output_mutation=True)
-def load_contract():
-    with open(Path('./contracts/compiled/emrblocks_abi.json')) as f:
-        contract_abi = json.load(f)
-    contract_address = os.getenv("SMART_CONTRACT_ADDRESS")
-    contract = w3.eth.contract(
-        address=contract_address,
-        abi=contract_abi
-    )
-    return contract
-contract = load_contract()
+# # def load_contract():
+# #     with open(Path('./contracts/compiled/emrblocks_abi.json')) as f:
+# #         contract_abi = json.load(f)
+# #     contract_address = os.getenv("SMART_CONTRACT_ADDRESS")
+# #     contract = w3.eth.contract(
+# #         address=contract_address,
+# #         abi=contract_abi
+# #     )
+# #     return contract
+# # contract = load_contract()
 
 # IPFS helper functions
 def pin_patient(patientName,dateOfBirth,gender,weight,height, patientImage):
@@ -51,8 +51,8 @@ def pinUpdateWeight(): #@TODO pinning updated weight to patient json, update alr
 # Title and account selection
 st.title('Blockchain EMR System')
 st.write('Choose an account to get started')
-accounts = w3.eth.accounts
-address = st.selectbox('Select Account', options=accounts)
+# # accounts = w3.eth.accounts
+# # address = st.selectbox('Select Account', options=accounts)
 st.markdown('---')
 
 # Register New Patient

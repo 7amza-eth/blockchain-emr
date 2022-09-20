@@ -38,3 +38,13 @@ def pin_json_to_ipfs(json):
     print(r.json())
     ipfs_hash = r.json()["IpfsHash"]
     return ipfs_hash
+
+def hash_json_metadata(json):
+    r = requests.put(
+        "https://api.pinata.cloud/pinning/hashMetadata",
+        data=json,
+        headers=json_headers
+    )
+    print(r.json())
+    ipfs_hash = r.json()["IpfsHash"]
+    return r.text
