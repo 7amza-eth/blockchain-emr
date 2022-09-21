@@ -1,11 +1,12 @@
 import os
 import json
+from turtle import update
 from web3 import Web3
 from pathlib import Path
 from dotenv import load_dotenv
 import streamlit as st
 import time
-from pinata import pin_file_to_ipfs, pin_json_to_ipfs, convert_data_to_json
+from pinata import pin_file_to_ipfs, pin_json_to_ipfs, convert_data_to_json, hash_json_metadata
 
 load_dotenv()
 
@@ -30,23 +31,39 @@ def pin_patient(patientName,dateOfBirth,gender,weight,height, patientImage):
     #pin patient image
     ipfs_file_hash = pin_file_to_ipfs(patientImage.getvalue())
     #build an patient metadata JSON file
+    # 'image': ipfs_file_hash,
     patientJSON = {
-        'image': ipfs_file_hash,
         'name': patientName,
         'DOB': dateOfBirth,
         'gender': gender,
         'weight': weight,
         'height': height
     }
-    json_data = convert_data_to_json(patientJSON)
+    
+    # json_data = convert_data_to_json(patientJSON)
+    payload = {
+        'pinataOptions': {
+            'cidVersion': 1
+        },
+        'pinataMetadata': {
+            'name': f'{patientName} EMRB',
+            'keyvalues': patientJSON
+        },
+        'pinataContent': {
+            'image': f'https://ipfs.io/ipfs/{ipfs_file_hash}'
+        }
+    }
+
+    json_data = json.dumps(payload)
+
     #pin patient json file
     ipfs_json_hash = pin_json_to_ipfs(json_data)
     return ipfs_json_hash
 
-def pinUpdateHeight(): #@TODO pinning updated height to patient json, update already made json??
-    return
-def pinUpdateWeight(): #@TODO pinning updated weight to patient json, update already made json??
-    return
+# def pinUpdateHeight(): #@TODO pinning updated height to patient json, update already made json??
+#     return
+# def pinUpdateWeight(): #@TODO pinning updated weight to patient json, update already made json??
+#     return
 
 # Title and account selection
 st.title('Blockchain EMR System')
@@ -66,38 +83,53 @@ patientImage = st.file_uploader('Upload patient picture', type=["jpg", "jpeg", "
 if st.button('Register Patient'):
     patient_ipfs_hash = pin_patient(patientName,str(dateOfBirth),gender,weight,height, patientImage)
     patient_uri = f'ipfs://{patient_ipfs_hash}'
-    tx_hash = contract.functions.registerPatient(
-        address,
-        patientName,
-        time.mktime(dateOfBirth.timetuple()),
-        patient_uri
-    ).transact({'from': address, 'gas': 1000000})
-    receipt = w3.eth.waitForTransactionReceipt(tx_hash)
+    # # tx_hash = contract.functions.registerPatient(
+    # #     address,
+    # #     patientName,
+    # #     time.mktime(dateOfBirth.timetuple()),
+    # #     patient_uri
+    # # ).transact({'from': address, 'gas': 1000000})
+    # # receipt = w3.eth.waitForTransactionReceipt(tx_hash)
     st.write("Transaction receipt mined:")
-    st.write(dict(receipt))
+    # st.write(dict(receipt))
     st.write("You can view the pinned patient record with the following IPFS Gateway Link")
-    st.markdown(f"[Artwork IPFS Gateway Link](https://ipfs.io/ipfs/{patient_ipfs_hash})")
+    st.markdown(f"[EMRB IPFS Gateway Link](https://ipfs.io/ipfs/{patient_ipfs_hash})")
 st.markdown("---")
 
 # @TODO add functions for updating patients height and weight
 
 # Update a patients weight
 st.markdown('## Update Patients Weight')
-token_id = st.text_input('What is your Patient ID #')
+token_id = st.text_input('What is your Patient ID # (EMRB CID)')
 newWeight = st.number_input('Insert new patient weight in lbs', min_value=0, step=1)
 # @TODO should a notes section be added?
 if st.button('Update Weight'):
-    # @TODO add json update
-    st.write("Patient weight has been updated")
+    payload = json.dumps({
+        "ipfsPinHash": token_id,
+        "name": f'{patientName} EMRB',
+        "keyvalues": {
+            "weight": newWeight
+        }
+    })
+
+    update_result = hash_json_metadata(payload)
+    st.write(f"Patient weight has been updated: {update_result}")
 st.markdown('---')
 
 # Update a patients height
 st.markdown('## Update Patients Height')
 token_id = st.text_input('What is your Patient ID #')
-newWeight = st.number_input('Insert new patient height in lbs', min_value=0, step=1)
+newHeight = st.number_input('Insert new patient height in inches', min_value=0, step=1)
 # @TODO should a notes section be added?
 if st.button('Update Height'):
-    # @TODO add json update
-    print("Patient height has been updated")
+    payload = json.dumps({
+        "ipfsPinHash": token_id,
+        "name": f'{patientName} EMRB',
+        "keyvalues": {
+            "height": newHeight
+        }
+    })
+    update_result = hash_json_metadata(payload)
+    print(f"Patient height has been updated: {update_result}")
 
 # @TODO add function for viewing patients record
