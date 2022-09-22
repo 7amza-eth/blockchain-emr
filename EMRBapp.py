@@ -60,76 +60,85 @@ def pin_patient(patientName,dateOfBirth,gender,weight,height, patientImage):
     ipfs_json_hash = pin_json_to_ipfs(json_data)
     return ipfs_json_hash
 
-# def pinUpdateHeight(): #@TODO pinning updated height to patient json, update already made json??
-#     return
-# def pinUpdateWeight(): #@TODO pinning updated weight to patient json, update already made json??
-#     return
+### Streamlit Frontend
 
-# Title and account selection
-st.title('Blockchain EMR System')
-st.write('Choose an account to get started')
-# # accounts = w3.eth.accounts
-# # address = st.selectbox('Select Account', options=accounts)
+# Account and Function selection
+st.sidebar.title('Blockchain EMR System')
+st.sidebar.write('Choose an account to get started')
+accounts = w3.eth.accounts
+address = st.sidebar.selectbox('Select Account', options=accounts)
 st.markdown('---')
+st.sidebar.write('Select a function from the dropdown menu below')
+menu = ['Register Patient', 'Update Patient Info', 'View Patient Info']
+function = st.sidebar.selectbox('Menu', options=menu)
+
 
 # Register New Patient
-st.markdown('## Register New Patient')
-patientName = st.text_input('Enter patient name')
-dateOfBirth = st.date_input('Enter patient date of birth') #@TODO find way to set date to uint256 for solidity
-gender = st.selectbox('Select gender', options=['male','female'])
-weight = st.number_input('Insert patient weight in lbs', min_value=0, step=1)
-height = st.number_input('Insert patient height in inches', min_value=0, step=1)
-patientImage = st.file_uploader('Upload patient picture', type=["jpg", "jpeg", "png"])
-if st.button('Register Patient'):
-    patient_ipfs_hash = pin_patient(patientName,str(dateOfBirth),gender,weight,height, patientImage)
-    patient_uri = f'ipfs://{patient_ipfs_hash}'
-    # # tx_hash = contract.functions.registerPatient(
-    # #     address,
-    # #     patientName,
-    # #     time.mktime(dateOfBirth.timetuple()),
-    # #     patient_uri
-    # # ).transact({'from': address, 'gas': 1000000})
-    # # receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-    st.write("Transaction receipt mined:")
-    # st.write(dict(receipt))
-    st.write("You can view the pinned patient record with the following IPFS Gateway Link")
-    st.markdown(f"[EMRB IPFS Gateway Link](https://ipfs.io/ipfs/{patient_ipfs_hash})")
-st.markdown("---")
+if function == 'Register Patient':
+    st.markdown('## Register New Patient')
+    patientName = st.text_input('Enter patient name')
+    dateOfBirth = st.date_input('Enter patient date of birth') #@TODO find way to set date to uint256 for solidity
+    gender = st.selectbox('Select gender', options=['male','female'])
+    weight = st.number_input('Insert patient weight in lbs', min_value=0, step=1)
+    height = st.number_input('Insert patient height in inches', min_value=0, step=1)
+    patientImage = st.file_uploader('Upload patient picture', type=["jpg", "jpeg", "png"])
+    if st.button('Register Patient'):
+        patient_ipfs_hash = pin_patient(patientName,str(dateOfBirth),gender,weight,height, patientImage)
+        patient_uri = f'ipfs://{patient_ipfs_hash}'
+        # # tx_hash = contract.functions.registerPatient(
+        # #     address,
+        # #     patientName,
+        # #     time.mktime(dateOfBirth.timetuple()),
+        # #     patient_uri
+        # # ).transact({'from': address, 'gas': 1000000})
+        # # receipt = w3.eth.waitForTransactionReceipt(tx_hash)
+        st.write("Transaction receipt mined:")
+        # st.write(dict(receipt))
+        st.write("You can view the pinned patient record with the following IPFS Gateway Link")
+        st.markdown(f"[EMRB IPFS Gateway Link](https://ipfs.io/ipfs/{patient_ipfs_hash})")
+    st.markdown("---")
 
-# @TODO add functions for updating patients height and weight
+# Update Patient Info
+elif function == 'Update Patient Info':
+    # Update a patients weight
+    st.markdown('## Update Patients Weight')
+    token_id = st.text_input('What is your Patient ID # (EMRB CID)')
+    newWeight = st.number_input('Insert new patient weight in lbs', min_value=0, step=1)
+    # @TODO should a notes section be added?
+    if st.button('Update Weight'):
+        payload = json.dumps({
+            "ipfsPinHash": token_id,
+            "name": f'{patientName} EMRB',
+            "keyvalues": {
+                "weight": newWeight
+            }
+        })
 
-# Update a patients weight
-st.markdown('## Update Patients Weight')
-token_id = st.text_input('What is your Patient ID # (EMRB CID)')
-newWeight = st.number_input('Insert new patient weight in lbs', min_value=0, step=1)
-# @TODO should a notes section be added?
-if st.button('Update Weight'):
-    payload = json.dumps({
-        "ipfsPinHash": token_id,
-        "name": f'{patientName} EMRB',
-        "keyvalues": {
-            "weight": newWeight
-        }
-    })
+        update_result = hash_json_metadata(payload)
+        st.write(f"Patient weight has been updated: {update_result}")
+    st.markdown('---')
 
-    update_result = hash_json_metadata(payload)
-    st.write(f"Patient weight has been updated: {update_result}")
-st.markdown('---')
-
-# Update a patients height
-st.markdown('## Update Patients Height')
-token_id = st.text_input('What is your Patient ID #')
-newHeight = st.number_input('Insert new patient height in inches', min_value=0, step=1)
-# @TODO should a notes section be added?
-if st.button('Update Height'):
-    payload = json.dumps({
-        "ipfsPinHash": token_id,
-        "name": f'{patientName} EMRB',
-        "keyvalues": {
-            "height": newHeight
-        }
-    })
-    update_result = hash_json_metadata(payload)
-    print(f"Patient height has been updated: {update_result}")
+    # Update a patients height
+    st.markdown('## Update Patients Height')
+    token_id = st.text_input('What is your Patient ID #')
+    newHeight = st.number_input('Insert new patient height in inches', min_value=0, step=1)
+    # @TODO should a notes section be added?
+    if st.button('Update Height'):
+        payload = json.dumps({
+            "ipfsPinHash": token_id,
+            "name": f'{patientName} EMRB',
+            "keyvalues": {
+                "height": newHeight
+            }
+        })
+        update_result = hash_json_metadata(payload)
+        print(f"Patient height has been updated: {update_result}")
 
 # @TODO add function for viewing patients record
+elif function == 'View Patient Info':
+    st.markdown('## View Patient Info')
+    tokens = contract.functions.totalSupply().call()
+    token_id = st.selectbox("Select your Patient ID", list(range(tokens)))
+    if st.button("Retrieve Patient Info"):
+        retrieve_uri = contract.functions.patientURI(token_id).call()
+        st.write(retrieve_uri)
