@@ -45,6 +45,6 @@ def hash_json_metadata(json):
         data=json,
         headers=json_headers
     )
-    print(r.json())
-    ipfs_hash = r.json()["IpfsHash"]
+    # print(r.json())
+    # ipfs_hash = r.json()["IpfsHash"]
     return r.text
