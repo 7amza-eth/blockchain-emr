@@ -29,9 +29,5 @@ contract EmrBlocks is ERC721Full {
 
         return tokenId;
 
-    } //TODO fill out function
-
-    function updateWeight() public {}//TODO
-
-    function updateHeight() public {}//TODO
+    }
 }

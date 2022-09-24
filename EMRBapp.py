@@ -100,9 +100,16 @@ if function == 'Register Patient':
 
 # Update Patient Info
 elif function == 'Update Patient Info':
+    #choose patient to be updated
+    st.title('Update Patient Info')
+    tokens = contract.functions.balanceOf(address).call()
+    token_id = st.selectbox("Select which patient's info you would like to update", list(range(tokens)))
+    retrieve_uri = contract.functions.patientURI(token_id).call()
+    # @TODO finish token selection
+
     # Update a patients weight
     st.markdown('## Update Patients Weight')
-    token_id = st.text_input('What is your Patient ID # (EMRB CID)')
+    #token_id = st.text_input('What is your Patient ID # (EMRB CID)')
     newWeight = st.number_input('Insert new patient weight in lbs', min_value=0, step=1)
     # @TODO should a notes section be added?
     if st.button('Update Weight'):
@@ -120,7 +127,7 @@ elif function == 'Update Patient Info':
 
     # Update a patients height
     st.markdown('## Update Patients Height')
-    token_id = st.text_input('What is your Patient ID #')
+    #token_id = st.text_input('What is your Patient ID #')
     newHeight = st.number_input('Insert new patient height in inches', min_value=0, step=1)
     # @TODO should a notes section be added?
     if st.button('Update Height'):
@@ -136,6 +143,7 @@ elif function == 'Update Patient Info':
 
 # @TODO add function for viewing patients record
 elif function == 'View Patient Info':
+    # @TODO token selection from within patients address
     st.markdown('## View Patient Info')
     tokens = contract.functions.totalSupply().call()
     token_id = st.selectbox("Select your Patient ID", list(range(tokens)))
